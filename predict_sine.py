@@ -44,7 +44,7 @@ def predict_MLP(params, x):
     prediction = jnp.dot(final_w, activation) + final_b
     return prediction  
 
-def loss(params, x, y, lr):
+def loss(params, x, y):
     '''Loss function'''
     batched_predict_MLP = jax.vmap(predict_MLP, in_axes=(None, 0))
     return jnp.mean((batched_predict_MLP(params, x) - y) **2) # MSE loss 
@@ -52,7 +52,7 @@ def loss(params, x, y, lr):
 @jax.jit
 def update(params, x, y, lr):
     '''Calculate gradients and update parameters'''
-    grads = jax.grad(loss)(params, x, y, lr)
+    grads = jax.grad(loss)(params, x, y)
     return jax.tree_multimap(lambda p, g: p - lr*g, params, grads) #SGD 
 
 def training_loop(params, x, y, x_test, y_test, lr, num_epochs, batch_size):
@@ -66,8 +66,8 @@ def training_loop(params, x, y, x_test, y_test, lr, num_epochs, batch_size):
                 # last batch is smaller if batch size not divisable
                 params = update(params, x[i:len(x)], y[i:len(x)], lr)
         epoch_time = time.time() - start_time
-        train_acc = loss(params, x, y, lr)
-        test_acc = loss(params,x_test, y_test, lr)
+        train_acc = loss(params, x, y)
+        test_acc = loss(params,x_test, y_test)
         print("Epoch {} in {:0.2f} sec".format(epoch, epoch_time))
         print("Training set accuracy {}".format(train_acc))
         print("Test set accuracy {}".format(test_acc))
@@ -82,8 +82,8 @@ def main(args):
     MLP_params = init_MLP([1, 128, 128, 1], key)
     batched_predict_MLP = jax.vmap(predict_MLP, in_axes=(None, 0))
     MLP_params = training_loop(MLP_params, xTr, yTr, xTe, yTe, args.lr, args.epochs, args.batch_size)
-    plt.scatter(xTr, yTr, s=2, label="Training data")
-    plt.scatter(xTe, batched_predict_MLP(MLP_params, xTe), s=2, label = "Model Prediction")
+    plt.scatter(xTr, yTr, s=3, label="Training data")
+    plt.scatter(xTe, batched_predict_MLP(MLP_params, xTe), s=3, label = "Model Prediction")
     plt.legend()
     plt.show()
 
