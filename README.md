@@ -7,6 +7,11 @@ python predict_sine.py
 ```
 
 ## TODO 
+Predicting the sine function in JAX and optax. 
+```
+python predict_sine_with_optax.py
+```
+
 Predicting the sine function in JAX and Haiku. 
 ```
 python predict_sine_with_haiku.py
