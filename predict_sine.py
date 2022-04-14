@@ -17,8 +17,8 @@ def generate_sin(num_examples, key):
     y_test = jnp.sin(x_test)
     return x_train, y_train, x_test, y_test
 
-def init_MLP(layer_sizes, init_key, scale=1e-2): 
-    '''Initialize MLP'''
+def init_network(layer_sizes, init_key, scale=1e-2): 
+    '''Initialize a multilayer perceptron'''
     params = [] 
     keys = jax.random.split(init_key, len(layer_sizes)-1)
     for input_size, output_size, key in zip(layer_sizes[:-1], layer_sizes[1:], keys): 
@@ -31,8 +31,8 @@ def init_MLP(layer_sizes, init_key, scale=1e-2):
         )
     return params
 
-def predict_MLP(params, input_data):
-    '''Predict using the MLP'''
+def predict(params, input_data):
+    '''prediction with a forward pass using a multilayer perceptron'''
     hidden_layers = params[:-1]
     activation = input_data
     # all layers minus the last layer
@@ -46,8 +46,8 @@ def predict_MLP(params, input_data):
 
 def loss(params, x_inputs, y_target_outputs):
     '''Loss function'''
-    batched_predict_MLP = jax.vmap(predict_MLP, in_axes=(None, 0))
-    return jnp.mean((batched_predict_MLP(params, x_inputs) - y_target_outputs) **2) # MSE loss 
+    batched_predict = jax.vmap(predict, in_axes=(None, 0))
+    return jnp.mean((batched_predict(params, x_inputs) - y_target_outputs) **2) # MSE loss 
 
 @jax.jit
 def update(params, x_train, y_train, lr):
@@ -63,19 +63,23 @@ def training_loop(params, x_train, y_train, x_test, y_test, lr, num_epochs, batc
         for batch_start in range(0, num_examples, batch_size):
             if batch_start + batch_size < num_examples:
                 params = update(
-                        params, 
-                        x_train[batch_start:batch_start+batch_size], 
-                        y_train[batch_start:batch_start+batch_size], 
-                        lr)
+                    params, 
+                    x_train[batch_start:batch_start+batch_size], 
+                    y_train[batch_start:batch_start+batch_size], 
+                    lr)
             else: 
                 # last batch is smaller if batch size not divisable
-                params = update(params, x_train[batch_start:num_examples], x_train[batch_start:num_examples], lr)
+                params = update(
+                    params, 
+                    x_train[batch_start:num_examples], 
+                    y_train[batch_start:num_examples], 
+                    lr)
         epoch_time = time.time() - start_time
         train_mse = loss(params, x_train, y_train)
         test_mse = loss(params,x_test, y_test)
         print("Epoch {} in {:0.2f} sec".format(epoch, epoch_time))
-        print("Training set accuracy {}".format(train_mse))
-        print("Test set accuracy {}".format(test_mse))
+        print("Training set MSE {}".format(train_mse))
+        print("Test set MSE {}".format(test_mse))
     return params
 
 # TODO: write a save function 
@@ -87,11 +91,20 @@ def save_model(params):
 def main(args): 
     key = jax.random.PRNGKey(args.seed)
     x_train, y_train, x_test, y_test = generate_sin(args.num_examples, key)
-    MLP_params = init_MLP([1, 128, 128, 1], key)
-    batched_predict_MLP = jax.vmap(predict_MLP, in_axes=(None, 0))
-    MLP_params = training_loop(MLP_params, x_train, y_train, x_test, y_test, args.learning_rate, args.epochs, args.batch_size)
+    layers = [args.layers.input_size, args.layers.layer1_size, args.layers.layer2_size, args.layers.output_size]
+    network_params = init_network(layers, key)
+    network_params = training_loop(
+        network_params, 
+        x_train, 
+        y_train, 
+        x_test, 
+        y_test, 
+        args.learning_rate, 
+        args.epochs, 
+        args.batch_size)
+    batched_predict = jax.vmap(predict, in_axes=(None, 0))
     plt.scatter(x_train, y_train, s=3, label="Training data")
-    plt.scatter(x_test, batched_predict_MLP(MLP_params, x_test), s=3, label = "Model Prediction")
+    plt.scatter(x_test, batched_predict(network_params, x_test), s=3, label = "Model Prediction")
     plt.legend()
     plt.show()
 
