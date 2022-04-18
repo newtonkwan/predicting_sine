@@ -126,7 +126,7 @@ def main(args):
         ax2.legend()
         ax2.set_title("Training and Test Losses")
         path = os.path.dirname(os.path.abspath(__file__))
-        plt.savefig(path+'/plots/haiku_plots.png', bbox_inches='tight')
+        plt.savefig(path+'/plots/haiku_plots.png', bbox_inches='tight', dpi=300)
         plt.show()
 
     # Initailize rng keys 
