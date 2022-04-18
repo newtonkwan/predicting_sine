@@ -126,7 +126,9 @@ def main(args):
         ax2.legend()
         ax2.set_title("Training and Test Losses")
         path = os.path.dirname(os.path.abspath(__file__))
-        plt.savefig(path+'/plots/haiku_plots.png', bbox_inches='tight', dpi=300)
+        print("Saving plot ... ")
+        plt.savefig(path+'/plots/haiku_plots.png', bbox_inches='tight', dpi=800)
+        print(f"Done. Path to plot: {path+'/plots/haiku_plots.png'}")
         plt.show()
 
     # Initailize rng keys 
@@ -158,6 +160,8 @@ def main(args):
     # Save model 
     path = os.path.dirname(os.path.abspath(__file__))
     model_name = "sine_haiku_model"
+    print("Saving model ...")
+    print(f"Done. Path to model: {path}/models/{model_name}.pickle")
     save(network_params, path=path+"/models/"+model_name, overwrite=True)
 
     # Show plots 
