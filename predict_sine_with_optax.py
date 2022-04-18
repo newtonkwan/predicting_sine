@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import time
 import hydra
 import optax
+import haiku as hk
 
 def generate_sin(num_examples, key):
     '''Generates samples from sin function'''
@@ -100,6 +101,7 @@ def main(args):
     x_train, y_train, x_test, y_test = generate_sin(args.num_examples, key)
     layers = [args.layers.input_size, args.layers.layer1_size, args.layers.layer2_size, args.layers.output_size]
     network_params = init_network(layers, key)
+    print(network_params)
     optimizer = optax.adam(learning_rate = args.learning_rate)
     network_params = training_loop(
         network_params, 
