@@ -118,7 +118,7 @@ def main(args):
         ax1.scatter(x_test, apply_net(network_params, x_test), s=3, label = "Model Prediction")
         ax1.set_title("Sin function")
         ax1.legend()
-        ax2.plot(range(epochs), train_losses, label="Training loss")
+        ax2.plot(range(epochs), train_losses, label = "Training loss")
         ax2.plot(range(epochs), test_losses, label = "Test loss")
         ax2.set_xlabel("Epochs")
         ax2.set_ylabel("Loss")
