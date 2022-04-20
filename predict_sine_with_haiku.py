@@ -83,11 +83,11 @@ def main(args):
         opt_state = optimizer.init(params)
         train_losses, test_losses = [], []
 
-        num_examples = len(x_train) 
+        num_batches = len(x_train) 
         for epoch in range(num_epochs):
             epoch_sum_of_train_loss = 0 
             start_time = time.time()
-            for batch_i in range(0, num_examples):    
+            for batch_i in range(0, num_batches):    
                 params, opt_state, step_train_loss = step(
                     params, 
                     opt_state,
