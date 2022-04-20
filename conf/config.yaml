@@ -1,6 +1,6 @@
 seed: 0
-num_examples: 1000
-batch_size: 32
+num_batches: 75
+batch_size: 16
 learning_rate: 0.001
 epochs: 100
 
