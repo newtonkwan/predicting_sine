@@ -78,7 +78,7 @@ def main(args):
         params = optax.apply_updates(params, updates)
         return params, opt_state, loss_value
     
-    def training_loop(params, optimizer, x_train, y_train, x_test, y_test, lr, num_epochs, batch_size):
+    def training_loop(params, optimizer, x_train, y_train, x_test, y_test, num_epochs):
         '''Training loop'''
         opt_state = optimizer.init(params)
         train_losses, test_losses = [], []
@@ -152,10 +152,8 @@ def main(args):
         x_train, 
         y_train, 
         x_test, 
-        y_test, 
-        args.learning_rate, 
-        args.epochs, 
-        args.batch_size)
+        y_test,
+        args.epochs)
 
     # Save model 
     path = os.path.dirname(os.path.abspath(__file__))
